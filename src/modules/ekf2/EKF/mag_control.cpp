@@ -150,8 +150,6 @@ void Ekf::controlMagFusion()
 
 					_aid_src_mag_heading.time_last_fuse = _time_delayed_us;
 					_time_last_heading_fuse = _time_delayed_us;
-
-					_last_static_yaw = NAN;
 				}
 			}
 		}
@@ -238,9 +236,13 @@ bool Ekf::haglYawResetReq()
 	if (_control_status.flags.in_air && _control_status.flags.yaw_align && !_control_status.flags.mag_aligned_in_flight) {
 		// Check if height has increased sufficiently to be away from ground magnetic anomalies
 		// and request a yaw reset if not already requested.
+#if defined(CONFIG_EKF2_RANGE_FINDER)
 		static constexpr float mag_anomalies_max_hagl = 1.5f;
 		const bool above_mag_anomalies = (getTerrainVPos() - _state.pos(2)) > mag_anomalies_max_hagl;
 		return above_mag_anomalies;
+#else
+		return true;
+#endif // CONFIG_EKF2_RANGE_FINDER
 	}
 
 	return false;
