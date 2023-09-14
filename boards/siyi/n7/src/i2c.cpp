@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2020-2022 PX4 Development Team. All rights reserved.
+ *   Copyright (C) 2020 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,45 +31,11 @@
  *
  ****************************************************************************/
 
-#include <matrix/math.hpp>
+#include <px4_arch/i2c_hw_description.h>
 
-#ifndef EKF_UTILS_HPP
-#define EKF_UTILS_HPP
-
-// Use Kahan summation algorithm to get the sum of "sum_previous" and "input".
-// This function relies on the caller to be responsible for keeping a copy of
-// "accumulator" and passing this value at the next iteration.
-// Ref: https://en.wikipedia.org/wiki/Kahan_summation_algorithm
-inline float kahanSummation(float sum_previous, float input, float &accumulator)
-{
-	const float y = input - accumulator;
-	const float t = sum_previous + y;
-	accumulator = (t - sum_previous) - y;
-	return t;
-}
-
-namespace ecl
-{
-inline float powf(float x, int exp)
-{
-	float ret;
-
-	if (exp > 0) {
-		ret = x;
-
-		for (int count = 1; count < exp; count++) {
-			ret *= x;
-		}
-
-		return ret;
-
-	} else if (exp < 0) {
-		return 1.0f / ecl::powf(x, -exp);
-	}
-
-	return 1.0f;
-}
-
-} // namespace ecl
-
-#endif // EKF_UTILS_HPP
+constexpr px4_i2c_bus_t px4_i2c_buses[I2C_BUS_MAX_BUS_ITEMS] = {
+	initI2CBusExternal(1),
+	initI2CBusExternal(2),
+	initI2CBusInternal(3),
+	initI2CBusExternal(4),
+};

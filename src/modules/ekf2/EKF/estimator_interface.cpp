@@ -471,7 +471,7 @@ void EstimatorInterface::setSystemFlagData(const systemFlagUpdate &system_flags)
 		_system_flag_buffer->push(system_flags_new);
 
 	} else {
-		ECL_WARN("system flag update too fast %" PRIi64 " < %" PRIu64 " + %d", time_us, _system_flag_buffer->get_newest().time_us, _min_obs_interval_us);
+		ECL_DEBUG("system flag update too fast %" PRIi64 " < %" PRIu64 " + %d", time_us, _system_flag_buffer->get_newest().time_us, _min_obs_interval_us);
 	}
 }
 
@@ -492,6 +492,17 @@ void EstimatorInterface::setDragData(const imuSample &imu)
 				printBufferAllocationFailed("drag");
 				return;
 			}
+		}
+
+		// don't use any accel samples that are clipping
+		if (imu.delta_vel_clipping[0] || imu.delta_vel_clipping[1] || imu.delta_vel_clipping[2]) {
+			// reset accumulators
+			_drag_sample_count = 0;
+			_drag_down_sampled.accelXY.zero();
+			_drag_down_sampled.time_us = 0;
+			_drag_sample_time_dt = 0.0f;
+
+			return;
 		}
 
 		_drag_sample_count++;

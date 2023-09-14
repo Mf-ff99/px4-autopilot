@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2022 PX4 Development Team. All rights reserved.
+# Copyright (c) 2023 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -30,15 +30,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 ############################################################################
-
-
-px4_add_library(ArmStateMachine
-	ArmStateMachine.cpp
-)
-target_include_directories(ArmStateMachine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(ArmStateMachine PUBLIC health_and_arming_checks)
-
-px4_add_functional_gtest(SRC ArmStateMachineTest.cpp
-	LINKLIBS ArmStateMachine health_and_arming_checks hysteresis sensor_calibration ArmAuthorization mode_util
+px4_add_module(
+	MODULE drivers__differential_pressure__asp5033
+	MAIN asp5033
+	COMPILE_FLAGS
+	SRCS
+		asp5033_main.cpp
+		ASP5033.cpp
+		ASP5033.hpp
+	DEPENDS
+		px4_work_queue
 	)
-

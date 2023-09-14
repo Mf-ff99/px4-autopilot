@@ -81,6 +81,8 @@ void Ekf::controlExternalVisionFusion()
 		stopEvYawFusion();
 		stopEvHgtFusion();
 
+		_ev_q_error_initialized = false;
+
 		_warning_events.flags.vision_data_stopped = true;
 		ECL_WARN("vision data stopped");
 	}
@@ -88,7 +90,7 @@ void Ekf::controlExternalVisionFusion()
 
 void Ekf::updateEvAttitudeErrorFilter(extVisionSample &ev_sample, bool ev_reset)
 {
-	const AxisAnglef q_error((_state.quat_nominal * ev_sample.quat.inversed()).normalized());
+	const Quatf q_error((_state.quat_nominal * ev_sample.quat.inversed()).normalized());
 
 	if (!q_error.isAllFinite()) {
 		return;
